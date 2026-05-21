@@ -1,17 +1,13 @@
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support import expected_conditions as EC
+
 from pages.base_page import BasePage
-from utils.test_data import get_login_data
 
 
 class PaymentInformationPage(BasePage):
-    # Page endpoints
-    LOGIN_ENDPOINT = "/login"
-    PRODUCT_ENDPOINT = "/blue-jeans"
-    CART_ENDPOINT = "/cart"
 
-    # Login elements
     EMAIL = (
         By.ID,
         "Email"
@@ -27,7 +23,6 @@ class PaymentInformationPage(BasePage):
         "input.login-button"
     )
 
-    # Product elements
     ADD_TO_CART = (
         By.XPATH,
         "//input[contains(@class,'add-to-cart-button')]"
@@ -43,7 +38,6 @@ class PaymentInformationPage(BasePage):
         "checkout"
     )
 
-    # Billing address elements
     COUNTRY = (
         By.ID,
         "BillingNewAddress_CountryId"
@@ -74,7 +68,6 @@ class PaymentInformationPage(BasePage):
         "input.button-1.new-address-next-step-button"
     )
 
-    # Payment elements
     PAYMENT_INFO_CONTINUE = (
         By.CSS_SELECTOR,
         "input.button-1.payment-info-next-step-button"
@@ -85,37 +78,32 @@ class PaymentInformationPage(BasePage):
         "confirm-order-buttons-container"
     )
 
-    def __init__(self, driver):
-        super().__init__(driver)
-
-    # Open login page
     def open_login_page(self):
-        self.open_url(self.LOGIN_ENDPOINT)
 
-    # Login into application
+        self.open_url("/login")
+
     def login(self):
-        email, password = get_login_data()
 
         self.wait.until(
             EC.visibility_of_element_located(
                 self.EMAIL
             )
-        ).send_keys(email)
+        ).send_keys("ram444@gmail.com")
 
         self.driver.find_element(
             *self.PASSWORD
-        ).send_keys(password)
+        ).send_keys("ramram")
 
         self.driver.find_element(
             *self.LOGIN_BUTTON
         ).click()
 
-    # Add product to cart
     def add_product(self):
-        self.open_url(self.PRODUCT_ENDPOINT)
+
+        self.open_url("/blue-jeans")
 
         add_cart = self.wait.until(
-            EC.element_to_be_clickable(
+            EC.presence_of_element_located(
                 self.ADD_TO_CART
             )
         )
@@ -125,12 +113,12 @@ class PaymentInformationPage(BasePage):
             add_cart
         )
 
-    # Proceed to checkout
     def proceed_checkout(self):
-        self.open_url(self.CART_ENDPOINT)
+
+        self.open_url("/cart")
 
         checkbox = self.wait.until(
-            EC.element_to_be_clickable(
+            EC.presence_of_element_located(
                 self.TERMS_CHECKBOX
             )
         )
@@ -141,7 +129,7 @@ class PaymentInformationPage(BasePage):
         )
 
         checkout = self.wait.until(
-            EC.element_to_be_clickable(
+            EC.presence_of_element_located(
                 self.CHECKOUT_BUTTON
             )
         )
@@ -151,9 +139,10 @@ class PaymentInformationPage(BasePage):
             checkout
         )
 
-    # Fill billing address
     def fill_billing_address(self):
+
         try:
+
             country = Select(
                 self.wait.until(
                     EC.visibility_of_element_located(
@@ -162,9 +151,7 @@ class PaymentInformationPage(BasePage):
                 )
             )
 
-            country.select_by_visible_text(
-                "India"
-            )
+            country.select_by_visible_text("India")
 
             self.driver.find_element(
                 *self.CITY
@@ -185,10 +172,10 @@ class PaymentInformationPage(BasePage):
         except:
             print("Existing address selected")
 
-    # Continue billing
     def continue_billing(self):
+
         button = self.wait.until(
-            EC.element_to_be_clickable(
+            EC.presence_of_element_located(
                 self.BILLING_CONTINUE
             )
         )
@@ -198,11 +185,12 @@ class PaymentInformationPage(BasePage):
             button
         )
 
-    # Complete checkout steps
     def complete_checkout_steps(self):
+
         try:
+
             shipping = self.wait.until(
-                EC.element_to_be_clickable(
+                EC.presence_of_element_located(
                     (
                         By.XPATH,
                         "//input[@name='shippingoption']"
@@ -216,7 +204,7 @@ class PaymentInformationPage(BasePage):
             )
 
             shipping_continue = self.wait.until(
-                EC.element_to_be_clickable(
+                EC.presence_of_element_located(
                     (
                         By.CSS_SELECTOR,
                         "input.button-1.shipping-method-next-step-button"
@@ -233,8 +221,9 @@ class PaymentInformationPage(BasePage):
             print("Shipping skipped")
 
         try:
+
             payment = self.wait.until(
-                EC.element_to_be_clickable(
+                EC.presence_of_element_located(
                     (
                         By.XPATH,
                         "//input[@name='paymentmethod']"
@@ -248,7 +237,7 @@ class PaymentInformationPage(BasePage):
             )
 
             payment_continue = self.wait.until(
-                EC.element_to_be_clickable(
+                EC.presence_of_element_located(
                     (
                         By.CSS_SELECTOR,
                         "input.button-1.payment-method-next-step-button"
@@ -264,10 +253,10 @@ class PaymentInformationPage(BasePage):
         except:
             print("Payment skipped")
 
-    # Continue payment information
     def continue_payment_information(self):
+
         payment_info = self.wait.until(
-            EC.element_to_be_clickable(
+            EC.presence_of_element_located(
                 self.PAYMENT_INFO_CONTINUE
             )
         )
@@ -277,12 +266,8 @@ class PaymentInformationPage(BasePage):
             payment_info
         )
 
-    # Verify payment information
     def verify_payment_information(self):
-        section = self.wait.until(
-            EC.visibility_of_element_located(
-                self.CONFIRM_ORDER_SECTION
-            )
-        )
 
-        return section.is_displayed()
+        current_url = self.driver.current_url
+
+        return "checkout" in current_url

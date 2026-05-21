@@ -3,9 +3,11 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support import expected_conditions as EC
 from pages.base_page import BasePage
 from utils.test_data import get_login_data
+import time
 
 
 class PaymentMethodPage(BasePage):
+
     # Page endpoints
     LOGIN_ENDPOINT = "/login"
     PRODUCT_ENDPOINT = "/blue-jeans"
@@ -43,14 +45,27 @@ class PaymentMethodPage(BasePage):
         "input.button-1.new-address-next-step-button"
     )
 
+    # Shipping address continue
+    SHIPPING_ADDRESS_CONTINUE = (
+        By.XPATH,
+        "//div[@id='shipping-buttons-container']//input[@value='Continue']"
+    )
+
+    # Shipping method
+    SHIPPING_METHOD_RADIO = (
+        By.XPATH,
+        "//input[@name='shippingoption']"
+    )
+
     SHIPPING_CONTINUE = (
         By.CSS_SELECTOR,
         "input.button-1.shipping-method-next-step-button"
     )
 
+    # Payment method
     PAYMENT_METHOD_RADIO = (
-        By.ID,
-        "paymentmethod_1"
+        By.XPATH,
+        "//input[@name='paymentmethod']"
     )
 
     PAYMENT_CONTINUE = (
@@ -98,6 +113,7 @@ class PaymentMethodPage(BasePage):
 
     # Login into application
     def login(self):
+
         email, password = get_login_data()
 
         self.wait.until(
@@ -116,6 +132,7 @@ class PaymentMethodPage(BasePage):
 
     # Add product to cart
     def add_product(self):
+
         self.open_url(self.PRODUCT_ENDPOINT)
 
         add_cart = self.wait.until(
@@ -129,8 +146,11 @@ class PaymentMethodPage(BasePage):
             add_cart
         )
 
+        print("Product added")
+
     # Proceed to checkout
     def proceed_checkout(self):
+
         self.open_url(self.CART_ENDPOINT)
 
         checkbox = self.wait.until(
@@ -155,9 +175,13 @@ class PaymentMethodPage(BasePage):
             checkout
         )
 
+        print("Checkout started")
+
     # Fill billing address
     def fill_billing_address(self):
+
         try:
+
             country = Select(
                 self.wait.until(
                     EC.visibility_of_element_located(
@@ -186,6 +210,8 @@ class PaymentMethodPage(BasePage):
                 *self.PHONE_NUMBER
             ).send_keys("9876543210")
 
+            print("New billing address added")
+
         except:
             print(
                 "Existing billing address selected"
@@ -193,6 +219,7 @@ class PaymentMethodPage(BasePage):
 
     # Continue billing
     def continue_billing(self):
+
         continue_button = self.wait.until(
             EC.element_to_be_clickable(
                 self.BILLING_CONTINUE
@@ -204,15 +231,47 @@ class PaymentMethodPage(BasePage):
             continue_button
         )
 
+        print("Billing continued")
+
+        time.sleep(3)
+
     # Complete checkout steps
     def complete_checkout_steps(self):
+
+        # Shipping Address Continue
         try:
+
+            shipping_address_continue = self.wait.until(
+                EC.element_to_be_clickable(
+                    self.SHIPPING_ADDRESS_CONTINUE
+                )
+            )
+
+            self.driver.execute_script(
+                "arguments[0].scrollIntoView(true);",
+                shipping_address_continue
+            )
+
+            time.sleep(2)
+
+            self.driver.execute_script(
+                "arguments[0].click();",
+                shipping_address_continue
+            )
+
+            print("Shipping address continued")
+
+            time.sleep(3)
+
+        except Exception as e:
+            print("Shipping address skipped:", e)
+
+        # Shipping Method
+        try:
+
             shipping_method = self.wait.until(
                 EC.element_to_be_clickable(
-                    (
-                        By.XPATH,
-                        "//input[@name='shippingoption']"
-                    )
+                    self.SHIPPING_METHOD_RADIO
                 )
             )
 
@@ -220,6 +279,8 @@ class PaymentMethodPage(BasePage):
                 "arguments[0].click();",
                 shipping_method
             )
+
+            print("Shipping method selected")
 
             shipping_continue = self.wait.until(
                 EC.element_to_be_clickable(
@@ -232,16 +293,19 @@ class PaymentMethodPage(BasePage):
                 shipping_continue
             )
 
-        except:
-            print("Shipping method skipped")
+            print("Shipping method continued")
 
+            time.sleep(3)
+
+        except Exception as e:
+            print("Shipping method skipped:", e)
+
+        # Payment Method
         try:
+
             payment_method = self.wait.until(
                 EC.element_to_be_clickable(
-                    (
-                        By.XPATH,
-                        "//input[@name='paymentmethod']"
-                    )
+                    self.PAYMENT_METHOD_RADIO
                 )
             )
 
@@ -249,6 +313,8 @@ class PaymentMethodPage(BasePage):
                 "arguments[0].click();",
                 payment_method
             )
+
+            print("Payment method selected")
 
             payment_continue = self.wait.until(
                 EC.element_to_be_clickable(
@@ -261,11 +327,16 @@ class PaymentMethodPage(BasePage):
                 payment_continue
             )
 
-        except:
-            print("Payment method skipped")
+            print("Payment method continued")
+
+            time.sleep(3)
+
+        except Exception as e:
+            print("Payment method skipped:", e)
 
     # Verify payment method
     def verify_payment_method(self):
+
         payment = self.wait.until(
             EC.visibility_of_element_located(
                 self.PAYMENT_INFO_SECTION

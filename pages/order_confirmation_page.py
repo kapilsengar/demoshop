@@ -3,9 +3,11 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support import expected_conditions as EC
 from pages.base_page import BasePage
 from utils.test_data import get_login_data
+import time
 
 
 class OrderConfirmationPage(BasePage):
+
     # Page endpoints
     LOGIN_ENDPOINT = "/login"
     PRODUCT_ENDPOINT = "/blue-jeans"
@@ -25,11 +27,6 @@ class OrderConfirmationPage(BasePage):
     ADD_TO_CART = (
         By.XPATH,
         "//input[contains(@class,'add-to-cart-button')]"
-    )
-
-    SHOPPING_CART = (
-        By.LINK_TEXT,
-        "Shopping cart"
     )
 
     TERMS_CHECKBOX = (
@@ -71,6 +68,12 @@ class OrderConfirmationPage(BasePage):
     BILLING_CONTINUE = (
         By.CSS_SELECTOR,
         "input.button-1.new-address-next-step-button"
+    )
+
+    # Shipping Address Continue
+    SHIPPING_ADDRESS_CONTINUE = (
+        By.XPATH,
+        "//div[@id='shipping-buttons-container']//input[@value='Continue']"
     )
 
     # Shipping elements
@@ -120,6 +123,7 @@ class OrderConfirmationPage(BasePage):
 
     # Login into application
     def login(self):
+
         email, password = get_login_data()
 
         self.wait.until(
@@ -138,6 +142,7 @@ class OrderConfirmationPage(BasePage):
 
     # Add product to cart
     def add_product(self):
+
         self.open_url(self.PRODUCT_ENDPOINT)
 
         add_cart = self.wait.until(
@@ -151,8 +156,11 @@ class OrderConfirmationPage(BasePage):
             add_cart
         )
 
+        print("Product added to cart")
+
     # Proceed to checkout
     def proceed_checkout(self):
+
         self.open_url(self.CART_ENDPOINT)
 
         checkbox = self.wait.until(
@@ -177,9 +185,13 @@ class OrderConfirmationPage(BasePage):
             checkout
         )
 
+        print("Checkout started")
+
     # Fill billing address
     def fill_billing_address(self):
+
         try:
+
             country = Select(
                 self.wait.until(
                     EC.visibility_of_element_located(
@@ -208,11 +220,14 @@ class OrderConfirmationPage(BasePage):
                 *self.PHONE_NUMBER
             ).send_keys("9876543210")
 
+            print("New billing address added")
+
         except:
             print("Existing address selected")
 
     # Continue billing
     def continue_billing(self):
+
         button = self.wait.until(
             EC.element_to_be_clickable(
                 self.BILLING_CONTINUE
@@ -224,9 +239,44 @@ class OrderConfirmationPage(BasePage):
             button
         )
 
+        print("Billing continued")
+
+        time.sleep(3)
+
     # Complete checkout steps
     def complete_checkout_steps(self):
+
+        # Shipping Address Continue
         try:
+
+            shipping_address_continue = self.wait.until(
+                EC.element_to_be_clickable(
+                    self.SHIPPING_ADDRESS_CONTINUE
+                )
+            )
+
+            self.driver.execute_script(
+                "arguments[0].scrollIntoView(true);",
+                shipping_address_continue
+            )
+
+            time.sleep(2)
+
+            self.driver.execute_script(
+                "arguments[0].click();",
+                shipping_address_continue
+            )
+
+            print("Shipping address continued")
+
+            time.sleep(3)
+
+        except Exception as e:
+            print("Shipping address skipped:", e)
+
+        # Shipping Method
+        try:
+
             shipping_method = self.wait.until(
                 EC.element_to_be_clickable(
                     self.SHIPPING_METHOD_RADIO
@@ -237,6 +287,8 @@ class OrderConfirmationPage(BasePage):
                 "arguments[0].click();",
                 shipping_method
             )
+
+            print("Shipping method selected")
 
             shipping_continue = self.wait.until(
                 EC.element_to_be_clickable(
@@ -249,10 +301,16 @@ class OrderConfirmationPage(BasePage):
                 shipping_continue
             )
 
-        except:
-            print("Shipping method skipped")
+            print("Shipping method continued")
 
+            time.sleep(3)
+
+        except Exception as e:
+            print("Shipping method skipped:", e)
+
+        # Payment Method
         try:
+
             payment_method = self.wait.until(
                 EC.element_to_be_clickable(
                     self.PAYMENT_METHOD_RADIO
@@ -263,6 +321,8 @@ class OrderConfirmationPage(BasePage):
                 "arguments[0].click();",
                 payment_method
             )
+
+            print("Payment method selected")
 
             payment_continue = self.wait.until(
                 EC.element_to_be_clickable(
@@ -275,10 +335,16 @@ class OrderConfirmationPage(BasePage):
                 payment_continue
             )
 
-        except:
-            print("Payment method skipped")
+            print("Payment method continued")
 
+            time.sleep(3)
+
+        except Exception as e:
+            print("Payment method skipped:", e)
+
+        # Payment Info
         try:
+
             payment_info = self.wait.until(
                 EC.element_to_be_clickable(
                     self.PAYMENT_INFO_CONTINUE
@@ -290,11 +356,16 @@ class OrderConfirmationPage(BasePage):
                 payment_info
             )
 
-        except:
-            print("Payment info skipped")
+            print("Payment info continued")
+
+            time.sleep(3)
+
+        except Exception as e:
+            print("Payment info skipped:", e)
 
     # Confirm order
     def confirm_order(self):
+
         button = self.wait.until(
             EC.element_to_be_clickable(
                 self.CONFIRM_ORDER_BUTTON
@@ -302,12 +373,22 @@ class OrderConfirmationPage(BasePage):
         )
 
         self.driver.execute_script(
+            "arguments[0].scrollIntoView(true);",
+            button
+        )
+
+        time.sleep(2)
+
+        self.driver.execute_script(
             "arguments[0].click();",
             button
         )
 
+        print("Order confirmed")
+
     # Verify successful order
     def verify_order_success(self):
+
         success = self.wait.until(
             EC.visibility_of_element_located(
                 self.SUCCESS_MESSAGE
