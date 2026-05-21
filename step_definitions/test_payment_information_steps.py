@@ -1,38 +1,43 @@
 from pytest_bdd import scenarios, given, when, then
-from pages.payment_information_page import PaymentInformationPage
+from pages.payment_information_page import (
+    PaymentInformationPage
+)
+
+# Load feature file
+scenarios(
+    "../features/payment_information.feature"
+)
 
 
-scenarios("../features/payment_information.feature")
-
-
+# Open payment information page
 @given("user is on payment information page")
 def payment_info_page(browser):
+    browser.payment_page = (
+        PaymentInformationPage(browser)
+    )
 
-    payment = PaymentInformationPage(browser)
+    browser.payment_page.open_login_page()
+    browser.payment_page.login()
 
-    payment.open_login_page()
-    payment.login()
+    browser.payment_page.add_product()
+    browser.payment_page.proceed_checkout()
 
-    payment.add_product()
-    payment.proceed_checkout()
+    browser.payment_page.fill_billing_address()
+    browser.payment_page.continue_billing()
 
-    payment.fill_billing_address()
-    payment.continue_billing()
-
-    payment.complete_checkout_steps()
+    browser.payment_page.complete_checkout_steps()
 
 
+# Continue payment information
 @when("user continues payment information")
 def continue_payment(browser):
-
-    payment = PaymentInformationPage(browser)
-
-    payment.continue_payment_information()
+    browser.payment_page.continue_payment_information()
 
 
+# Verify payment information
 @then("payment information should be processed")
 def verify_payment(browser):
-
-    payment = PaymentInformationPage(browser)
-
-    assert payment.verify_payment_information()
+    assert (
+        browser.payment_page
+        .verify_payment_information()
+    )

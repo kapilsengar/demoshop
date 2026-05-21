@@ -1,11 +1,17 @@
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support import expected_conditions as EC
 from pages.base_page import BasePage
+from utils.test_data import get_login_data
+
 
 class ShippingMethodPage(BasePage):
+    # Page endpoints
+    LOGIN_ENDPOINT = "/login"
+    PRODUCT_ENDPOINT = "/blue-jeans"
+    CART_ENDPOINT = "/cart"
 
+    # Login elements
     EMAIL = (By.ID, "Email")
 
     PASSWORD = (By.ID, "Password")
@@ -15,11 +21,7 @@ class ShippingMethodPage(BasePage):
         "input.login-button"
     )
 
-    PRODUCT = (
-        By.LINK_TEXT,
-        "Blue Jeans"
-    )
-
+    # Product elements
     ADD_TO_CART = (
         By.XPATH,
         "//input[contains(@class,'add-to-cart-button')]"
@@ -40,6 +42,7 @@ class ShippingMethodPage(BasePage):
         "checkout"
     )
 
+    # Billing address elements
     COUNTRY = (
         By.ID,
         "BillingNewAddress_CountryId"
@@ -70,6 +73,7 @@ class ShippingMethodPage(BasePage):
         "input.button-1.new-address-next-step-button"
     )
 
+    # Shipping elements
     SHIPPING_METHOD_RADIO = (
         By.XPATH,
         "//input[@name='shippingoption']"
@@ -85,38 +89,37 @@ class ShippingMethodPage(BasePage):
         "payment-method-block"
     )
 
-    
+    def __init__(self, driver):
+        super().__init__(driver)
 
+    # Open login page
     def open_login_page(self):
+        self.open_url(self.LOGIN_ENDPOINT)
 
-        self.open_url(
-            "https://demowebshop.tricentis.com/login"
-        )
-
+    # Login into application
     def login(self):
+        email, password = get_login_data()
 
         self.wait.until(
             EC.visibility_of_element_located(
                 self.EMAIL
             )
-        ).send_keys("ram444@gmail.com")
+        ).send_keys(email)
 
         self.driver.find_element(
             *self.PASSWORD
-        ).send_keys("ramram")
+        ).send_keys(password)
 
         self.driver.find_element(
             *self.LOGIN_BUTTON
         ).click()
 
+    # Add product to cart
     def add_product(self):
-
-        self.driver.get(
-            "https://demowebshop.tricentis.com/blue-jeans"
-        )
+        self.open_url(self.PRODUCT_ENDPOINT)
 
         add_cart = self.wait.until(
-            EC.presence_of_element_located(
+            EC.element_to_be_clickable(
                 self.ADD_TO_CART
             )
         )
@@ -126,14 +129,12 @@ class ShippingMethodPage(BasePage):
             add_cart
         )
 
+    # Proceed to checkout
     def proceed_checkout(self):
-
-        self.driver.get(
-            "https://demowebshop.tricentis.com/cart"
-        )
+        self.open_url(self.CART_ENDPOINT)
 
         checkbox = self.wait.until(
-            EC.presence_of_element_located(
+            EC.element_to_be_clickable(
                 self.TERMS_CHECKBOX
             )
         )
@@ -144,7 +145,7 @@ class ShippingMethodPage(BasePage):
         )
 
         checkout = self.wait.until(
-            EC.presence_of_element_located(
+            EC.element_to_be_clickable(
                 self.CHECKOUT_BUTTON
             )
         )
@@ -154,10 +155,9 @@ class ShippingMethodPage(BasePage):
             checkout
         )
 
+    # Fill billing address
     def fill_billing_address(self):
-
         try:
-
             country = Select(
                 self.wait.until(
                     EC.visibility_of_element_located(
@@ -166,7 +166,9 @@ class ShippingMethodPage(BasePage):
                 )
             )
 
-            country.select_by_visible_text("India")
+            country.select_by_visible_text(
+                "India"
+            )
 
             self.driver.find_element(
                 *self.CITY
@@ -187,10 +189,10 @@ class ShippingMethodPage(BasePage):
         except:
             print("Existing address selected")
 
+    # Continue billing
     def continue_billing(self):
-
         continue_button = self.wait.until(
-            EC.presence_of_element_located(
+            EC.element_to_be_clickable(
                 self.BILLING_CONTINUE
             )
         )
@@ -200,16 +202,12 @@ class ShippingMethodPage(BasePage):
             continue_button
         )
 
+    # Complete shipping method
     def complete_checkout_steps(self):
-
         try:
-
             shipping_method = self.wait.until(
-                EC.presence_of_element_located(
-                    (
-                        By.XPATH,
-                        "//input[@name='shippingoption']"
-                    )
+                EC.element_to_be_clickable(
+                    self.SHIPPING_METHOD_RADIO
                 )
             )
 
@@ -218,14 +216,9 @@ class ShippingMethodPage(BasePage):
                 shipping_method
             )
 
-       
-
             shipping_continue = self.wait.until(
-                EC.presence_of_element_located(
-                    (
-                        By.CSS_SELECTOR,
-                        "input.button-1.shipping-method-next-step-button"
-                    )
+                EC.element_to_be_clickable(
+                    self.SHIPPING_METHOD_CONTINUE
                 )
             )
 
@@ -237,60 +230,8 @@ class ShippingMethodPage(BasePage):
         except:
             print("Shipping method skipped")
 
-        try:
-
-            payment_method = self.wait.until(
-                EC.presence_of_element_located(
-                    (
-                        By.XPATH,
-                        "//input[@name='paymentmethod']"
-                    )
-                )
-            )
-
-            self.driver.execute_script(
-                "arguments[0].click();",
-                payment_method
-            )
-
-            payment_continue = self.wait.until(
-                EC.presence_of_element_located(
-                    (
-                        By.CSS_SELECTOR,
-                        "input.button-1.payment-method-next-step-button"
-                    )
-                )
-            )
-
-            self.driver.execute_script(
-                "arguments[0].click();",
-                payment_continue
-            )
-
-        except:
-            print("Payment method skipped")
-
-        try:
-
-            payment_info = self.wait.until(
-                EC.presence_of_element_located(
-                    (
-                        By.CSS_SELECTOR,
-                        "input.button-1.payment-info-next-step-button"
-                    )
-                )
-            )
-
-            self.driver.execute_script(
-                "arguments[0].click();",
-                payment_info
-            )
-
-        except:
-            print("Payment info skipped")
-
+    # Verify shipping method
     def verify_shipping_method(self):
-
         payment = self.wait.until(
             EC.visibility_of_element_located(
                 self.PAYMENT_METHOD_SECTION

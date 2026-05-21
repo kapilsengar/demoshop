@@ -1,32 +1,30 @@
 from pytest_bdd import scenarios, given, when, then
 from pages.login_page import LoginPage
 
-
+# Load feature file
 scenarios("../features/login.feature")
 
 
+# Open login page
 @given("user opens login page")
 def open_login_page(browser):
-    login = LoginPage(browser)
-    login.open()
+    browser.login_page = LoginPage(browser)
+    browser.login_page.open()
 
 
+# Enter login credentials
 @when("user enters valid email and password")
 def enter_credentials(browser):
-    login = LoginPage(browser)
-
-    login.enter_email("ram444@gmail.com")
-    login.enter_password("ramram")
+    browser.login_page.enter_credentials()
 
 
+# Click login button
 @when("user clicks login button")
 def click_login(browser):
-    login = LoginPage(browser)
-    login.click_login()
+    browser.login_page.click_login()
 
 
+# Verify successful login
 @then("user should login successfully")
 def verify_login(browser):
-    login = LoginPage(browser)
-
-    assert login.is_logout_visible()
+    assert browser.login_page.is_logout_visible()

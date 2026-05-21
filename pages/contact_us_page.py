@@ -1,9 +1,22 @@
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from pages.base_page import BasePage
 
+
 class ContactUsPage(BasePage):
+    # Contact page endpoint
+    CONTACT_ENDPOINT = "/contactus"
+
+    # Web elements
+    FULL_NAME = (
+        By.ID,
+        "FullName"
+    )
+
+    EMAIL = (
+        By.ID,
+        "Email"
+    )
 
     ENQUIRY = (
         By.ID,
@@ -20,30 +33,23 @@ class ContactUsPage(BasePage):
         "result"
     )
 
-    
+    def __init__(self, driver):
+        super().__init__(driver)
 
+    # Open contact page
     def open_contact_page(self):
+        self.open_url(self.CONTACT_ENDPOINT)
 
-        self.open_url(
-            "https://demowebshop.tricentis.com/contactus"
-        )
-
+    # Submit contact form
     def submit_contact_form(self):
-
-        email = self.wait.until(
-            EC.presence_of_element_located(
-                (
-                    By.ID,
-                    "FullName"
-                )
+        self.wait.until(
+            EC.visibility_of_element_located(
+                self.FULL_NAME
             )
-        )
-
-        email.send_keys("Aditya Raj")
+        ).send_keys("Aditya Raj")
 
         self.driver.find_element(
-            By.ID,
-            "Email"
+            *self.EMAIL
         ).send_keys("ram444@gmail.com")
 
         self.driver.find_element(
@@ -53,7 +59,7 @@ class ContactUsPage(BasePage):
         )
 
         submit = self.wait.until(
-            EC.presence_of_element_located(
+            EC.element_to_be_clickable(
                 self.SUBMIT_BUTTON
             )
         )
@@ -63,6 +69,12 @@ class ContactUsPage(BasePage):
             submit
         )
 
+    # Verify successful submission
     def verify_contact_submission(self):
+        success = self.wait.until(
+            EC.visibility_of_element_located(
+                self.SUCCESS_MESSAGE
+            )
+        )
 
-        return "contactus" in self.driver.current_url
+        return success.is_displayed()

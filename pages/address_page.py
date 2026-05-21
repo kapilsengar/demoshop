@@ -1,20 +1,25 @@
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support import expected_conditions as EC
 from pages.base_page import BasePage
+from utils.test_data import get_login_data
+
 
 class AddressPage(BasePage):
+    # Page endpoints
+    LOGIN_ENDPOINT = "/login"
+    ADDRESS_ENDPOINT = "/customer/addresses"
 
+    # Login elements
     EMAIL = (By.ID, "Email")
     PASSWORD = (By.ID, "Password")
 
-    LOGIN_BUTTON = (By.CSS_SELECTOR,"input.login-button")
+    LOGIN_BUTTON = (
+        By.CSS_SELECTOR,
+        "input.login-button"
+    )
 
-    MY_ACCOUNT = (By.LINK_TEXT,"My account")
-
-    ADDRESSES_LINK = (By.LINK_TEXT,"Addresses")
-
+    # Address elements
     ADD_NEW_BUTTON = (
         By.CSS_SELECTOR,
         "input.button-1.add-address-button"
@@ -75,71 +80,45 @@ class AddressPage(BasePage):
         "div.section.address-item"
     )
 
-    
+    def __init__(self, driver):
+        super().__init__(driver)
 
+    # Open login page
     def open_login_page(self):
+        self.open_url(self.LOGIN_ENDPOINT)
 
-        self.open_url(
-            "https://demowebshop.tricentis.com/login"
-        )
-
+    # Login into application
     def login(self):
+        email, password = get_login_data()
 
         self.wait.until(
             EC.visibility_of_element_located(
                 self.EMAIL
             )
-        ).send_keys("ram444@gmail.com")
+        ).send_keys(email)
 
         self.driver.find_element(
             *self.PASSWORD
-        ).send_keys("ramram")
+        ).send_keys(password)
 
         self.driver.find_element(
             *self.LOGIN_BUTTON
         ).click()
 
-
+    # Open address page
     def open_addresses(self):
+        self.open_url(self.ADDRESS_ENDPOINT)
 
-        self.driver.get(
-            "https://demowebshop.tricentis.com/customer/addresses"
-        )
-
-    """def open_addresses(self):
-
-        my_account = self.wait.until(
-            EC.presence_of_element_located(
-                self.MY_ACCOUNT
-            )
-        )
-
-        self.driver.execute_script(
-            "arguments[0].click();",
-            my_account
-        )
-
-        addresses = self.wait.until(
-            EC.presence_of_element_located(
-                self.ADDRESSES_LINK
-            )
-        )
-
-        self.driver.execute_script(
-            "arguments[0].click();",
-            addresses
-        )"""
-
+    # Click add new address
     def click_add_new_address(self):
-
         self.wait.until(
             EC.element_to_be_clickable(
                 self.ADD_NEW_BUTTON
             )
         ).click()
 
+    # Fill address form
     def fill_address_form(self):
-
         self.wait.until(
             EC.visibility_of_element_located(
                 self.FIRST_NAME
@@ -164,7 +143,9 @@ class AddressPage(BasePage):
             )
         )
 
-        country.select_by_visible_text("India")
+        country.select_by_visible_text(
+            "India"
+        )
 
         self.driver.find_element(
             *self.CITY
@@ -182,16 +163,16 @@ class AddressPage(BasePage):
             *self.PHONE_NUMBER
         ).send_keys("9876543210")
 
+    # Save address
     def save_address(self):
-
         self.wait.until(
             EC.element_to_be_clickable(
                 self.SAVE_BUTTON
             )
         ).click()
 
+    # Verify address added
     def verify_address_added(self):
-
         success = self.wait.until(
             EC.visibility_of_element_located(
                 self.SUCCESS_MESSAGE

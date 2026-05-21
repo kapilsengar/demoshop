@@ -1,11 +1,15 @@
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support import expected_conditions as EC
 from pages.base_page import BasePage
+from utils.test_data import get_login_data
+
 
 class ShippingAddressPage(BasePage):
+    # Page endpoint
+    LOGIN_ENDPOINT = "/login"
 
+    # Login elements
     EMAIL = (By.ID, "Email")
 
     PASSWORD = (By.ID, "Password")
@@ -15,6 +19,7 @@ class ShippingAddressPage(BasePage):
         "input.login-button"
     )
 
+    # Product elements
     PRODUCT = (
         By.LINK_TEXT,
         "14.1-inch Laptop"
@@ -40,6 +45,7 @@ class ShippingAddressPage(BasePage):
         "checkout"
     )
 
+    # Billing address elements
     COUNTRY = (
         By.ID,
         "BillingNewAddress_CountryId"
@@ -75,34 +81,35 @@ class ShippingAddressPage(BasePage):
         "shipping-buttons-container"
     )
 
-    
+    def __init__(self, driver):
+        super().__init__(driver)
 
+    # Open login page
     def open_login_page(self):
+        self.open_url(self.LOGIN_ENDPOINT)
 
-        self.open_url(
-            "https://demowebshop.tricentis.com/login"
-        )
-
+    # Login into application
     def login(self):
+        email, password = get_login_data()
 
         self.wait.until(
             EC.visibility_of_element_located(
                 self.EMAIL
             )
-        ).send_keys("ram444@gmail.com")
+        ).send_keys(email)
 
         self.driver.find_element(
             *self.PASSWORD
-        ).send_keys("ramram")
+        ).send_keys(password)
 
         self.driver.find_element(
             *self.LOGIN_BUTTON
         ).click()
 
+    # Add product to cart
     def add_product(self):
-
         product = self.wait.until(
-            EC.presence_of_element_located(
+            EC.element_to_be_clickable(
                 self.PRODUCT
             )
         )
@@ -113,7 +120,7 @@ class ShippingAddressPage(BasePage):
         )
 
         add_cart = self.wait.until(
-            EC.presence_of_element_located(
+            EC.element_to_be_clickable(
                 self.ADD_TO_CART
             )
         )
@@ -123,10 +130,10 @@ class ShippingAddressPage(BasePage):
             add_cart
         )
 
+    # Proceed to checkout
     def proceed_checkout(self):
-
         cart = self.wait.until(
-            EC.presence_of_element_located(
+            EC.element_to_be_clickable(
                 self.SHOPPING_CART
             )
         )
@@ -137,7 +144,7 @@ class ShippingAddressPage(BasePage):
         )
 
         checkbox = self.wait.until(
-            EC.presence_of_element_located(
+            EC.element_to_be_clickable(
                 self.TERMS_CHECKBOX
             )
         )
@@ -148,7 +155,7 @@ class ShippingAddressPage(BasePage):
         )
 
         checkout = self.wait.until(
-            EC.presence_of_element_located(
+            EC.element_to_be_clickable(
                 self.CHECKOUT_BUTTON
             )
         )
@@ -158,10 +165,9 @@ class ShippingAddressPage(BasePage):
             checkout
         )
 
+    # Fill billing address
     def fill_billing_address(self):
-
         try:
-
             country = Select(
                 self.wait.until(
                     EC.visibility_of_element_located(
@@ -170,7 +176,9 @@ class ShippingAddressPage(BasePage):
                 )
             )
 
-            country.select_by_visible_text("India")
+            country.select_by_visible_text(
+                "India"
+            )
 
             self.driver.find_element(
                 *self.CITY
@@ -189,12 +197,14 @@ class ShippingAddressPage(BasePage):
             ).send_keys("9876543210")
 
         except:
-            print("Existing address already selected")
+            print(
+                "Existing address already selected"
+            )
 
+    # Continue billing process
     def continue_billing(self):
-
         continue_button = self.wait.until(
-            EC.presence_of_element_located(
+            EC.element_to_be_clickable(
                 self.BILLING_CONTINUE
             )
         )
@@ -204,8 +214,8 @@ class ShippingAddressPage(BasePage):
             continue_button
         )
 
+    # Verify shipping section
     def verify_shipping_address(self):
-
         shipping = self.wait.until(
             EC.visibility_of_element_located(
                 self.SHIPPING_SECTION

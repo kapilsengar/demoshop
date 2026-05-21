@@ -1,37 +1,30 @@
 from pytest_bdd import scenarios, given, when, then
 from pages.register_page import RegisterPage
 
-
+# Load feature file
 scenarios("../features/register.feature")
 
 
+# Open registration page
 @given("user opens registration page")
 def open_register(browser):
-
-    register = RegisterPage(browser)
-
-    register.open_register_page()
+    browser.register_page = RegisterPage(browser)
+    browser.register_page.open_register_page()
 
 
+# Enter registration details
 @when("user enters registration details")
 def enter_details(browser):
-
-    register = RegisterPage(browser)
-
-    register.enter_registration_details()
+    browser.register_page.enter_registration_details()
 
 
+# Click register button
 @when("user clicks register button")
 def click_register(browser):
-
-    register = RegisterPage(browser)
-
-    register.click_register()
+    browser.register_page.click_register()
 
 
+# Verify successful registration
 @then("user should register successfully")
 def verify_register(browser):
-
-    register = RegisterPage(browser)
-
-    assert register.verify_registration()
+    assert browser.register_page.verify_registration()
