@@ -9,15 +9,9 @@ class SearchPage(BasePage):
 
     # Web elements
     SEARCH_BOX = (By.ID, "small-searchterms")
-    SEARCH_BUTTON = (
-        By.CSS_SELECTOR,
-        "input.search-box-button"
-    )
+    SEARCH_BUTTON = (By.CSS_SELECTOR, "input.search-box-button")
 
-    PRODUCT_TITLE = (
-        By.XPATH,
-        "//h2[@class='product-title']/a"
-    )
+    PRODUCT_TITLE = (By.XPATH, "//h2[@class='product-title']/a")
 
     def __init__(self, driver):
         super().__init__(driver)
@@ -28,27 +22,15 @@ class SearchPage(BasePage):
 
     # Search product
     def search_product(self, product_name):
-        search_box = self.wait.until(
-            EC.visibility_of_element_located(
-                self.SEARCH_BOX
-            )
-        )
+        search_box = self.wait.until(EC.visibility_of_element_located(self.SEARCH_BOX))
 
         search_box.clear()
         search_box.send_keys(product_name)
 
-        self.wait.until(
-            EC.element_to_be_clickable(
-                self.SEARCH_BUTTON
-            )
-        ).click()
+        self.wait.until(EC.element_to_be_clickable(self.SEARCH_BUTTON)).click()
 
     # Verify searched product
     def is_product_displayed(self):
-        product = self.wait.until(
-            EC.visibility_of_element_located(
-                self.PRODUCT_TITLE
-            )
-        )
+        product = self.wait.until(EC.visibility_of_element_located(self.PRODUCT_TITLE))
 
         return product.is_displayed()

@@ -18,7 +18,6 @@ class RegisterPage(BasePage):
     REGISTER_BUTTON = (By.ID, "register-button")
     SUCCESS_MESSAGE = (By.CLASS_NAME, "result")
 
-
     # Open register page
     def open_register_page(self):
         self.open_url(self.REGISTER_ENDPOINT)
@@ -27,9 +26,7 @@ class RegisterPage(BasePage):
     def enter_registration_details(self):
         first_name, last_name, email, password = get_register_data()
 
-        self.wait.until(
-            EC.element_to_be_clickable(self.GENDER)
-        ).click()
+        self.wait.until(EC.element_to_be_clickable(self.GENDER)).click()
 
         self.driver.find_element(*self.FIRST_NAME).send_keys(first_name)
         self.driver.find_element(*self.LAST_NAME).send_keys(last_name)
@@ -39,9 +36,7 @@ class RegisterPage(BasePage):
 
     # Click register button
     def click_register(self):
-        self.wait.until(
-            EC.element_to_be_clickable(self.REGISTER_BUTTON)
-        ).click()
+        self.wait.until(EC.element_to_be_clickable(self.REGISTER_BUTTON)).click()
 
     # Verify successful registration
     def verify_registration(self):

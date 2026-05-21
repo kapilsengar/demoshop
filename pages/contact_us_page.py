@@ -8,30 +8,15 @@ class ContactUsPage(BasePage):
     CONTACT_ENDPOINT = "/contactus"
 
     # Web elements
-    FULL_NAME = (
-        By.ID,
-        "FullName"
-    )
+    FULL_NAME = (By.ID, "FullName")
 
-    EMAIL = (
-        By.ID,
-        "Email"
-    )
+    EMAIL = (By.ID, "Email")
 
-    ENQUIRY = (
-        By.ID,
-        "Enquiry"
-    )
+    ENQUIRY = (By.ID, "Enquiry")
 
-    SUBMIT_BUTTON = (
-        By.NAME,
-        "send-email"
-    )
+    SUBMIT_BUTTON = (By.NAME, "send-email")
 
-    SUCCESS_MESSAGE = (
-        By.CLASS_NAME,
-        "result"
-    )
+    SUCCESS_MESSAGE = (By.CLASS_NAME, "result")
 
     def __init__(self, driver):
         super().__init__(driver)
@@ -42,39 +27,24 @@ class ContactUsPage(BasePage):
 
     # Submit contact form
     def submit_contact_form(self):
-        self.wait.until(
-            EC.visibility_of_element_located(
-                self.FULL_NAME
-            )
-        ).send_keys("Aditya Raj")
+        self.wait.until(EC.visibility_of_element_located(self.FULL_NAME)).send_keys(
+            "Aditya Raj"
+        )
 
-        self.driver.find_element(
-            *self.EMAIL
-        ).send_keys("ram444@gmail.com")
+        self.driver.find_element(*self.EMAIL).send_keys("ram444@gmail.com")
 
-        self.driver.find_element(
-            *self.ENQUIRY
-        ).send_keys(
+        self.driver.find_element(*self.ENQUIRY).send_keys(
             "This is automation testing enquiry"
         )
 
-        submit = self.wait.until(
-            EC.element_to_be_clickable(
-                self.SUBMIT_BUTTON
-            )
-        )
+        submit = self.wait.until(EC.element_to_be_clickable(self.SUBMIT_BUTTON))
 
-        self.driver.execute_script(
-            "arguments[0].click();",
-            submit
-        )
+        self.driver.execute_script("arguments[0].click();", submit)
 
     # Verify successful submission
     def verify_contact_submission(self):
         success = self.wait.until(
-            EC.visibility_of_element_located(
-                self.SUCCESS_MESSAGE
-            )
+            EC.visibility_of_element_located(self.SUCCESS_MESSAGE)
         )
 
         return success.is_displayed()

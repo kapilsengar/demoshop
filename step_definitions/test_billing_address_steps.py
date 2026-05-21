@@ -26,7 +26,4 @@ def enter_address(browser):
 # Verify billing address
 @then("billing address should be saved")
 def verify_billing(browser):
-    assert (
-        browser.billing_page
-        .verify_billing_address_saved()
-    )
+    assert browser.billing_page.verify_billing_address_saved()

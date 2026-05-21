@@ -9,15 +9,9 @@ class ProductSortingPage(BasePage):
     CATEGORY_ENDPOINT = "/apparel-shoes"
 
     # Web elements
-    SORT_DROPDOWN = (
-        By.ID,
-        "products-orderby"
-    )
+    SORT_DROPDOWN = (By.ID, "products-orderby")
 
-    PRODUCT_PRICES = (
-        By.CSS_SELECTOR,
-        "span.price.actual-price"
-    )
+    PRODUCT_PRICES = (By.CSS_SELECTOR, "span.price.actual-price")
 
     def __init__(self, driver):
         super().__init__(driver)
@@ -29,39 +23,22 @@ class ProductSortingPage(BasePage):
     # Sort products by price
     def sort_products(self):
         dropdown = Select(
-            self.wait.until(
-                EC.presence_of_element_located(
-                    self.SORT_DROPDOWN
-                )
-            )
+            self.wait.until(EC.presence_of_element_located(self.SORT_DROPDOWN))
         )
 
-        dropdown.select_by_visible_text(
-            "Price: Low to High"
-        )
+        dropdown.select_by_visible_text("Price: Low to High")
 
     # Verify product sorting
     def verify_sorting(self):
-        self.wait.until(
-            EC.presence_of_all_elements_located(
-                self.PRODUCT_PRICES
-            )
-        )
+        self.wait.until(EC.presence_of_all_elements_located(self.PRODUCT_PRICES))
 
-        prices = self.driver.find_elements(
-            *self.PRODUCT_PRICES
-        )
+        prices = self.driver.find_elements(*self.PRODUCT_PRICES)
 
         price_list = []
 
         for price in prices:
-            value = price.text.replace(
-                "$",
-                ""
-            )
+            value = price.text.replace("$", "")
 
-            price_list.append(
-                float(value)
-            )
+            price_list.append(float(value))
 
         return price_list == sorted(price_list)
